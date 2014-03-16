@@ -98,7 +98,7 @@ public class SalesRecordDetailFragment extends ListFragment {
 			TextView numberOfSalseView = (TextView) convertView.findViewById(R.id.numberOfSales);
 			numberOfSalseView.setPadding(10, 0, 0, 0);
 			
-			Button deleteBtn = (Button) convertView.findViewById(R.id.minusButton);
+			Button deleteBtn = (Button) convertView.findViewById(R.id.deleteButton);
 			deleteBtn.setTag(position);
 			deleteBtn.setOnClickListener(new OnClickListener() {
 				@Override
