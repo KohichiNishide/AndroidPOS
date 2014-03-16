@@ -26,6 +26,13 @@ public class SingleSalesRecord {
 		orders.add(order);
 	}
 	
+	public void deleteOrder(Order order){
+		if (order == null) {
+			throw new IllegalArgumentException("Order is null");
+		}
+		orders.remove(order);
+	}
+	
 	public void setDiscountValue(double discountValue) {
 		this.discountValue = discountValue;
 	}

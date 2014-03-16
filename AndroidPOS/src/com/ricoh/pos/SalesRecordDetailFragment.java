@@ -6,11 +6,14 @@ import java.util.Date;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -66,7 +69,7 @@ public class SalesRecordDetailFragment extends ListFragment {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = inflater.inflate(R.layout.order_row, null);
+				convertView = inflater.inflate(R.layout.sales_row, null);
 			}
 			
 			Order order = orders.get(position);
@@ -91,6 +94,17 @@ public class SalesRecordDetailFragment extends ListFragment {
 
 			TextView numberOfSalseView = (TextView) convertView.findViewById(R.id.numberOfSales);
 			numberOfSalseView.setPadding(10, 0, 0, 0);
+			
+			Button deleteBtn = (Button) convertView.findViewById(R.id.minusButton);
+			deleteBtn.setTag(position);
+			deleteBtn.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					int position = (Integer)v.getTag();
+					orders.remove(position);
+					notifyDataSetChanged();
+				}
+			});
 
 			if (order == null || order.getNumberOfOrder() == 0) {
 				throw new AssertionError("Product which isn't ordered is shown");
