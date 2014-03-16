@@ -5,12 +5,12 @@ import java.io.BufferedReader;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.ricoh.pos.model.IOManager;
 import com.ricoh.pos.model.ProductsManager;
+import com.ricoh.pos.model.WomanShopSalesIOManager;
 
 public class DataSyncTask extends AsyncTask<String, Void, AsyncTaskResult<String>> {
 	final String TAG = "DataSyncTask";
@@ -18,15 +18,13 @@ public class DataSyncTask extends AsyncTask<String, Void, AsyncTaskResult<String
 	Context context;
 	ProgressDialog progressDialog;
 	IOManager womanShopIOManager;
-	SQLiteDatabase database;
 	ProductsManager productsManager;
 
 	public DataSyncTask(Context context, DataSyncTaskCallback callback,
-			IOManager womanShopIOManager, SQLiteDatabase database) {
+			IOManager womanShopIOManager) {
 		this.callback = callback;
 		this.context = context;
 		this.womanShopIOManager = womanShopIOManager;
-		this.database = database;
 		this.productsManager = ProductsManager.getInstance();
 	}
 
@@ -54,15 +52,17 @@ public class DataSyncTask extends AsyncTask<String, Void, AsyncTaskResult<String
 				Log.d("debug", "File not found");
 				return AsyncTaskResult.createErrorResult(R.string.sd_import_error);
 			}
-			womanShopIOManager.insertRecords(database, bufferReader);
+			womanShopIOManager.insertRecords(bufferReader);
 
-			String[] results = womanShopIOManager.searchAlldata(database);
+			String[] results = womanShopIOManager.searchAlldata();
 			for (String result : results) {
 				Log.d("debug", result);
 			}
 			productsManager.updateProducts(results);
+			WomanShopSalesIOManager.getInstance().exportCSV(context);
 		} catch (Exception e) {
 			// TODO: Should separate exception(Import, Export, at least)
+			e.printStackTrace();
 			return AsyncTaskResult.createErrorResult(R.string.sd_import_error);
 		}
 		// The argument is null because nothing to notify on success
@@ -74,7 +74,7 @@ public class DataSyncTask extends AsyncTask<String, Void, AsyncTaskResult<String
 		Log.d(TAG, "onPostExecute");
 		if (progressDialog.isShowing()) {
 			progressDialog.dismiss();
-
+			
 			if (result.isError()) {
 				callback.onFailedSyncData(result.getResourceId());
 			} else {
